@@ -1,3 +1,5 @@
+IMAGE_NAME=fire-backend
+
 # Default listen address
 listenaddr ?= :8080
 
@@ -19,4 +21,4 @@ docker-build:
 
 # Run docker container
 docker-run:
-	docker run -p 8080:8080 fire-backend
+	docker run -e FIRE_JWT_SECRET='$(FIRE_JWT_SECRET)' -e MONGO_URI='$(MONGO_URI)' -p 8080:8080 $(IMAGE_NAME)

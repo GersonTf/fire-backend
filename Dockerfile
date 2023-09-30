@@ -1,5 +1,5 @@
 # Stage 1: Build the Go binary
-FROM golang:1.21.1 AS builder
+FROM golang:1.21.1-alpine AS builder
 
 # Set the Current Working Directory inside the container
 WORKDIR /src
@@ -17,7 +17,7 @@ RUN go test ./...
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/app
 
 # Stage 2: Build a minimal image to run the binary
-FROM scratch
+FROM alpine
 
 # Copy the Go binary from the builder stage
 COPY --from=builder /go/bin/app /go/bin/app
