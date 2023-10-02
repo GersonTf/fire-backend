@@ -16,7 +16,9 @@ import (
 )
 
 func main() {
-	fmt.Println("Starting FIRE-ultimate...")
+	printBanner()
+
+	//creates the listenAddr flag, so we can start the app with a custom addr
 	listenAddr := flag.String("listenaddr", ":8080", "the server address")
 	flag.Parse()
 
@@ -41,7 +43,6 @@ func main() {
 
 	// Start the server in a new goroutine
 	go func() {
-		server.Start()
 		log.Fatal(server.Start())
 	}()
 
@@ -63,4 +64,13 @@ func main() {
 	}
 
 	fmt.Println("graceful shutdown finished correctly")
+}
+
+func printBanner() {
+	fmt.Println(`
+	/    // \/  __\/  __/  / \ /\/ \   /__ __\/ \/ \__/|/  _ \/__ __\/  __/
+	|  __\| ||  \/||  \    | | ||| |     / \  | || |\/||| / \|  / \  |  \  
+	| |   | ||    /|  /_   | \_/|| |_/\  | |  | || |  ||| |-||  | |  |  /_ 
+	\_/   \_/\_/\_\\____\  \____/\____/  \_/  \_/\_/  \|\_/ \|  \_/  \____\
+	`)
 }
