@@ -21,4 +21,8 @@ docker-build:
 
 # Run docker container
 docker-run:
-	docker run -e FIRE_JWT_SECRET='$(FIRE_JWT_SECRET)' -e MONGO_URI='$(MONGO_URI)' -p 8080:8080 $(IMAGE_NAME)
+	docker run \
+	-e FIRE_JWT_SECRET='$(FIRE_JWT_SECRET)' \
+	-e DB_NAME='$(DB_NAME)' \
+	-e MONGO_URI='$(MONGO_URI)' \
+	-p 8080:8080 $(IMAGE_NAME)

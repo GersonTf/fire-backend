@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/GersonTf/fire-backend/storage"
-	"github.com/GersonTf/fire-backend/utils"
 )
 
 type Server struct {
@@ -28,10 +27,10 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) handleGetUserByID(w http.ResponseWriter, r *http.Request) {
-	//todo error? aldo get id from request
-	user, _ := s.store.Get(10)
+	//todo errors? aldo get id from request
+	user, _ := s.store.Get("6518951f7ce51a124b37b532")
 
-	_ = utils.Round2Dec(10.3441)
+	// _ = utils.Round2Dec(10.3441)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
