@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/GersonTf/fire-backend/storage"
@@ -28,9 +29,19 @@ func (s *Server) Start() error {
 
 func (s *Server) handleGetUserByID(w http.ResponseWriter, r *http.Request) {
 	//todo errors? aldo get id from request
-	user, _ := s.store.Get("6518951f7ce51a124b37b532")
+	userID := r.URL.Query().Get("id")
+	if userID == "" {
+		http.Error(w, "Missing 'id' query parameter", http.StatusBadRequest)
+		return
+	}
 
-	// _ = utils.Round2Dec(10.3441)
+	user, err := s.store.Get(userID)
+	if err != nil {
+		// Log the error and return a 500 Internal Server Error response todo improve this strategy
+		log.Printf("Failed to get user by ID: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)

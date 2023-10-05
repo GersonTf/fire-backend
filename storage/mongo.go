@@ -79,3 +79,23 @@ func (s *MongoStorage) Get(id string) (*types.User, error) {
 
 	return &user, nil
 }
+
+// todo should be in user
+func (s *MongoStorage) Create(user *types.User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel() // todo: context to revise
+
+	collection := s.db.Collection(UserCollection)
+	result, err := collection.InsertOne(ctx, bson.M{
+		"username": user.Name,
+		"email":    user.Email,
+		"password": user.Password,
+	})
+	if err != nil {
+		return err
+	}
+
+	// Update the ID field of the user argument
+	user.ID = result.InsertedID.(primitive.ObjectID)
+	return nil
+}

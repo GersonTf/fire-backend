@@ -17,7 +17,7 @@ run:
 
 # Build docker image
 docker-build:
-	docker build -t fire-backend .
+	docker build -t $(IMAGE_NAME) .
 
 # Run docker container
 docker-run:
