@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,6 +13,7 @@ import (
 	"github.com/GersonTf/fire-backend/api"
 	"github.com/GersonTf/fire-backend/config"
 	"github.com/GersonTf/fire-backend/storage"
+	"github.com/GersonTf/fire-backend/utils"
 )
 
 func main() {
@@ -22,20 +23,20 @@ func main() {
 	listenAddr := flag.String("listenaddr", ":8080", "the server address")
 	flag.Parse()
 
-	fmt.Println("loading app configuration...")
+	slog.Info("loading app configuration...")
 	cfg := config.LoadConfig()
 
-	fmt.Println("Starting a DB connection...")
+	slog.Info("Starting a DB connection...")
 	store, err := storage.NewMongoStorage(cfg)
 	if err != nil {
 		log.Fatalf("failed to create a storage connection: %v", err)
 	}
 
-	fmt.Println("connected to the DB!")
-	fmt.Println("Starting server ...")
+	slog.Info("connected to the DB!")
+	slog.Info("Starting server ...")
 	//Start server with graceful shutdown
 	server := api.NewServer(*listenAddr, store)
-	fmt.Println("server running on port: ", *listenAddr)
+	slog.Info("Server running on", "port", *listenAddr)
 
 	// Create a channel to listen for termination signals
 	stopChan := make(chan os.Signal, 1)
@@ -43,13 +44,15 @@ func main() {
 
 	// Start the server in a new goroutine
 	go func() {
-		log.Fatal(server.Start())
+		if err := server.Start(); err != nil {
+			utils.LogError("Failure starting the server", err)
+		}
 	}()
 
 	// Block until a signal is received
 	<-stopChan
 
-	fmt.Println("Exit signal received, starting cleanup")
+	slog.Info("Exit signal received, starting cleanup")
 
 	// Perform cleanup
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -60,14 +63,14 @@ func main() {
 	// }
 
 	if err = store.Disconnect(ctx); err != nil {
-		log.Fatalf("failed to disconnect from MongoDB222: %v", err)
+		utils.LogError("Failed to disconnect from store", err)
 	}
 
-	fmt.Println("graceful shutdown finished correctly")
+	slog.Info("graceful shutdown finished correctly")
 }
 
 func printBanner() {
-	fmt.Println(`
+	slog.Info(`
 	/    // \/  __\/  __/  / \ /\/ \   /__ __\/ \/ \__/|/  _ \/__ __\/  __/
 	|  __\| ||  \/||  \    | | ||| |     / \  | || |\/||| / \|  / \  |  \  
 	| |   | ||    /|  /_   | \_/|| |_/\  | |  | || |  ||| |-||  | |  |  /_ 
