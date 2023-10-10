@@ -22,13 +22,13 @@ type MongoStorage struct {
 	db       *mongo.Database
 }
 
-func NewMongoStorage(cfg *config.Config) (*MongoStorage, error) {
+func NewMongoStorage(parentCtx context.Context, cfg *config.Config) (*MongoStorage, error) {
 	if cfg.MongoUri == "" || cfg.DBName == "" {
 		return nil, errors.New("missing DB config variables")
 	}
 
 	clientOptions := options.Client().ApplyURI(cfg.MongoUri)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(parentCtx, 10*time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, clientOptions)
@@ -53,7 +53,7 @@ func (s *MongoStorage) Disconnect(ctx context.Context) error {
 	return s.client.Disconnect(ctx)
 }
 
-func (s *MongoStorage) Get(id string) (*types.User, error) {
+func (s *MongoStorage) Get(ctx context.Context, id string) (*types.User, error) {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -65,12 +65,11 @@ func (s *MongoStorage) Get(id string) (*types.User, error) {
 
 	filter := bson.M{"_id": objID}
 
-	//todo learn about context
-	err = collection.FindOne(context.TODO(), filter).Decode(&user)
+	err = collection.FindOne(ctx, filter).Decode(&user)
 
 	switch err {
 	case mongo.ErrNoDocuments:
-		return nil, fmt.Errorf("User %s not found", id)
+		return nil, fmt.Errorf("user %s not found", id)
 	case nil:
 		// No error, so do nothing
 	default:
@@ -81,9 +80,9 @@ func (s *MongoStorage) Get(id string) (*types.User, error) {
 }
 
 // todo should be in user
-func (s *MongoStorage) Create(user *types.User) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel() // todo: context to revise
+func (s *MongoStorage) Create(ctx context.Context, user *types.User) error {
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
 
 	collection := s.db.Collection(UserCollection)
 	result, err := collection.InsertOne(ctx, bson.M{

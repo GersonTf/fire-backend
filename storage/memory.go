@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"context"
+
 	"github.com/GersonTf/fire-backend/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -11,9 +13,11 @@ func NewMemoryStorage() *MemoryStorage {
 	return &MemoryStorage{}
 }
 
-func (ms *MemoryStorage) Get(id string) (*types.User, error) {
+func (ms *MemoryStorage) Get(ctx context.Context, id string) (*types.User, error) {
 	return &types.User{
 		ID:   primitive.NewObjectID(),
 		Name: "Foo",
 	}, nil
 }
+
+//todo create

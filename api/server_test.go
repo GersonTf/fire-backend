@@ -15,9 +15,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
 )
 
-func SetupTestMongoContainer() (*mongodb.MongoDBContainer, func(), error) {
-	ctx := context.Background()
-
+func SetupTestMongoContainer(ctx context.Context) (*mongodb.MongoDBContainer, func(), error) {
 	mongodbContainer, err := mongodb.RunContainer(ctx, testcontainers.WithImage("mongo:6"))
 	if err != nil {
 		return nil, nil, err
@@ -34,12 +32,14 @@ func SetupTestMongoContainer() (*mongodb.MongoDBContainer, func(), error) {
 }
 
 func MongoTestSetup() (*storage.MongoStorage, func(), error) {
-	mc, cleanup, err := SetupTestMongoContainer()
+	ctx := context.Background()
+
+	mc, cleanup, err := SetupTestMongoContainer(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	cs, err := mc.ConnectionString(context.Background())
+	cs, err := mc.ConnectionString(ctx)
 	if err != nil {
 		return nil, cleanup, err
 	}
@@ -49,7 +49,7 @@ func MongoTestSetup() (*storage.MongoStorage, func(), error) {
 		DBName:   "testdb",
 	}
 
-	store, err := storage.NewMongoStorage(testConfig)
+	store, err := storage.NewMongoStorage(ctx, testConfig)
 	if err != nil {
 		return nil, cleanup, err
 	}
@@ -73,7 +73,7 @@ func TestHandleGetUsersByID(t *testing.T) {
 	}
 
 	// Call the Create method
-	if err := store.Create(testUser); err != nil {
+	if err := store.Create(context.Background(), testUser); err != nil {
 		t.Fatal("Error creating a test user", err)
 	}
 

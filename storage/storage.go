@@ -1,8 +1,12 @@
 package storage
 
-import "github.com/GersonTf/fire-backend/types"
+import (
+	"context"
+
+	"github.com/GersonTf/fire-backend/types"
+)
 
 type Storer interface {
-	Get(string) (*types.User, error)
-	Create(*types.User) error
+	Get(context.Context, string) (*types.User, error)
+	Create(context.Context, *types.User) error
 }

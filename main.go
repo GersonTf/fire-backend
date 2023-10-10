@@ -18,6 +18,7 @@ import (
 
 func main() {
 	printBanner()
+	ctx := context.Background()
 
 	//creates the listenAddr flag, so we can start the app with a custom addr
 	listenAddr := flag.String("listenaddr", ":8080", "the server address")
@@ -27,7 +28,7 @@ func main() {
 	cfg := config.LoadConfig()
 
 	slog.Info("Starting a DB connection...")
-	store, err := storage.NewMongoStorage(cfg)
+	store, err := storage.NewMongoStorage(ctx, cfg)
 	if err != nil {
 		log.Fatalf("failed to create a storage connection: %v", err)
 	}
@@ -54,15 +55,14 @@ func main() {
 
 	slog.Info("Exit signal received, starting cleanup")
 
-	// Perform cleanup
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	downCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	// 	if err := server.Shutdown(shutdownCtx); err != nil { TODO handle
 	// 		log.Fatalf("failed to gracefully shutdown the server: %v", err)
 	// }
 
-	if err = store.Disconnect(ctx); err != nil {
+	if err = store.Disconnect(downCtx); err != nil {
 		utils.LogError("Failed to disconnect from store", err)
 	}
 

@@ -35,7 +35,7 @@ func (s *Server) handleGetUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := s.store.Get(userID)
+	user, err := s.store.Get(r.Context(), userID)
 	if err != nil {
 		// Log the error and return a 500 Internal Server Error response todo improve this strategy
 		log.Printf("Failed to get user by ID: %v", err)
