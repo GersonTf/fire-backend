@@ -16,21 +16,20 @@ import (
 )
 
 var testUser types.User
-var store *storage.MongoStorage
+var store storage.Storer
 var server *Server
 
 func TestMain(m *testing.M) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
-
 	defer cancel()
 
-	testDB, err := utils.SetupTestMongoContainer(ctx)
-
+	container, err := utils.SetupTestMongoContainer(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	store, err = utils.CreateTestStorage(ctx, testDB.ConStr)
+	store, err = utils.CreateTestStorage(ctx, container.ConStr)
+
 	if err != nil {
 		panic(err)
 	}
@@ -52,7 +51,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// Cleanup after all tests have run
-	if cleanErr := testDB.Cleanup(); cleanErr != nil {
+	if cleanErr := container.Cleanup(); cleanErr != nil {
 		panic(cleanErr)
 	}
 

@@ -43,7 +43,7 @@ func SetupTestMongoContainer(ctx context.Context) (*TestDB, error) {
 	return &TestDB{ConStr: cs, Container: mongodbContainer, Cleanup: cleanup}, err
 }
 
-func CreateTestStorage(ctx context.Context, dbConn string) (*storage.MongoStorage, error) {
+func CreateTestStorage(ctx context.Context, dbConn string) (storage.Storer, error) {
 	testConfig := &config.Config{
 		MongoUri: dbConn,
 		DBName:   TestDBName,
