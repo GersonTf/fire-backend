@@ -57,14 +57,16 @@ func CreateTestStorage(ctx context.Context, dbConn string) (storage.Storer, erro
 	return store, nil
 }
 
-func Assert(t *testing.T, want any, got any) {
+func AssertEqual(t *testing.T, ttName string, want, got any) {
+	t.Helper() //marking this as a testing helper is important so the test tool can report errors correctly
 	if !reflect.DeepEqual(want, got) {
-		t.Fatalf("wanted %v, got %v", want, got)
+		t.Fatalf("%s: wanted %v, got %v", ttName, want, got)
 	}
 }
 
-func AssertNotEqual(t *testing.T, want any, got any) {
+func AssertNotEqual(t *testing.T, ttName string, want, got any) {
+	t.Helper() //marking this as a testing helper is important so the test tool can report errors correctly
 	if reflect.DeepEqual(want, got) {
-		t.Fatalf("unexpected match: both values are %v", got)
+		t.Fatalf("%s: unexpected match: both values are %v", ttName, got)
 	}
 }
