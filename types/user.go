@@ -12,3 +12,9 @@ type User struct {
 }
 
 func ValidateUser(u *User) bool { return true }
+
+func (u *User) NewUser(name, email, password string) {
+	u.Name = name
+	u.Email = email
+	u.Password = password
+}

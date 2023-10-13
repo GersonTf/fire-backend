@@ -20,4 +20,4 @@ func (ms *MemoryStorage) Get(ctx context.Context, id string) (*types.User, error
 	}, nil
 }
 
-//todo create
+//todo save

@@ -58,20 +58,6 @@ func CreateTestStorage(ctx context.Context, dbConn string) (*storage.MongoStorag
 	return store, nil
 }
 
-func CreateTestUser(store *storage.MongoStorage, user *types.User) error {
-	// Create test user
-	user.Name = "testuser"
-	user.Email = "test@example.com"
-	user.Password = "password123"
-
-	//create gets the user pointer and adds the inserted db ID to it
-	if err := store.Create(context.Background(), user); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func Assert(t *testing.T, want any, got any) {
 	if !reflect.DeepEqual(want, got) {
 		t.Fatalf("wanted %v, got %v", want, got)

@@ -20,8 +20,6 @@ var store *storage.MongoStorage
 var server *Server
 
 func TestMain(m *testing.M) {
-	var err error
-
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 
 	defer cancel()
@@ -38,7 +36,12 @@ func TestMain(m *testing.M) {
 	}
 
 	server = NewServer("", store)
-	utils.CreateTestUser(store, &testUser)
+
+	//store.Save gets the user pointer and adds the inserted db ID to it so we can use it in the tests
+	testUser.NewUser("testUser", "test@test.com", "testPassword")
+	if saveErr := store.Save(ctx, &testUser); saveErr != nil {
+		panic(saveErr)
+	}
 
 	// Run all tests in the package
 	code := m.Run()

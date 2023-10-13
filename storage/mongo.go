@@ -80,7 +80,7 @@ func (s *MongoStorage) Get(ctx context.Context, id string) (*types.User, error) 
 }
 
 // todo should be in user
-func (s *MongoStorage) Create(ctx context.Context, user *types.User) error {
+func (s *MongoStorage) Save(ctx context.Context, user *types.User) error {
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
