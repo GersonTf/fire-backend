@@ -89,7 +89,5 @@ func TestHandleGetUsersByID(t *testing.T) {
 			user.ID.Hex(), userID)
 	}
 
-	if user != testUser {
-		t.Fatalf("returned user is not the testUser")
-	}
+	utils.Assert(t, testUser, user)
 }

@@ -2,6 +2,8 @@ package utils
 
 import (
 	"context"
+	"reflect"
+	"testing"
 
 	"github.com/GersonTf/fire-backend/config"
 	"github.com/GersonTf/fire-backend/storage"
@@ -68,4 +70,16 @@ func CreateTestUser(store *storage.MongoStorage, user *types.User) error {
 	}
 
 	return nil
+}
+
+func Assert(t *testing.T, want any, got any) {
+	if !reflect.DeepEqual(want, got) {
+		t.Fatalf("wanted %v, got %v", want, got)
+	}
+}
+
+func AssertNotEqual(t *testing.T, want any, got any) {
+	if reflect.DeepEqual(want, got) {
+		t.Fatalf("unexpected match: both values are %v", got)
+	}
 }
