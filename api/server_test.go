@@ -60,36 +60,39 @@ func TestMain(m *testing.M) {
 }
 
 func TestHandleGetUsersByID(t *testing.T) {
-	userID := testUser.ID.Hex()
-
-	// Create a request to get the user by ID
-	req, err := http.NewRequest("GET", "/user?id="+userID, nil)
-	if err != nil {
-		t.Fatalf("Failed to create request: %v", err)
+	tests := []struct {
+		name   string
+		want   types.User
+		userID string
+	}{
+		{
+			name:   "Getting the initial test user",
+			want:   testUser,
+			userID: testUser.ID.Hex(),
+		},
 	}
 
-	// Create a ResponseRecorder to record the response
-	rr := httptest.NewRecorder()
+	for _, tt := range tests {
+		// Create a request to get the user by ID
+		req, err := http.NewRequest("GET", "/user?id="+tt.userID, nil)
+		if err != nil {
+			t.Fatalf("Failed to create request: %v", err)
+		}
 
-	// Call the handler directly
-	server.handleGetUserByID(rr, req)
+		// Create a ResponseRecorder to record the response
+		rr := httptest.NewRecorder()
 
-	// Check the status code
-	if rr.Code != http.StatusOK {
-		t.Fatalf("handler returned wrong status code: got %v want %v",
-			rr.Code, http.StatusOK)
+		// Call the handler directly
+		server.handleGetUserByID(rr, req)
+
+		// Check the response body
+		var returnedUser types.User
+		if err := json.Unmarshal(rr.Body.Bytes(), &returnedUser); err != nil {
+			t.Fatalf("Failed to unmarshal response body: %v", err)
+		}
+
+		utils.AssertEqual(t, tt.name, http.StatusOK, rr.Code)
+		utils.AssertEqual(t, tt.name, tt.userID, returnedUser.ID.Hex())
+		utils.AssertEqual(t, tt.name, tt.want, returnedUser)
 	}
-
-	// Check the response body
-	var user types.User
-	if err := json.Unmarshal(rr.Body.Bytes(), &user); err != nil {
-		t.Fatalf("Failed to unmarshal response body: %v", err)
-	}
-
-	if user.ID.Hex() != userID {
-		t.Errorf("Returned user ID does not match the inserted one: got %v want %v",
-			user.ID.Hex(), userID)
-	}
-
-	utils.Assert(t, testUser, user)
 }
