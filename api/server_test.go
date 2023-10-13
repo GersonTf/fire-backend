@@ -3,83 +3,61 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"testing"
+	"time"
 
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/GersonTf/fire-backend/config"
 	"github.com/GersonTf/fire-backend/storage"
 	"github.com/GersonTf/fire-backend/types"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/modules/mongodb"
+	"github.com/GersonTf/fire-backend/utils"
 )
 
-func SetupTestMongoContainer(ctx context.Context) (*mongodb.MongoDBContainer, func(), error) {
-	mongodbContainer, err := mongodb.RunContainer(ctx, testcontainers.WithImage("mongo:6"))
+var testUser types.User
+var store *storage.MongoStorage
+var server *Server
+
+func TestMain(m *testing.M) {
+	var err error
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+
+	defer cancel()
+
+	testDB, err := utils.SetupTestMongoContainer(ctx)
+
 	if err != nil {
-		return nil, nil, err
+		panic(err)
 	}
 
-	// Return cleanup function
-	cleanup := func() {
-		if err := mongodbContainer.Terminate(ctx); err != nil {
-			panic(err) // or log the error todo
-		}
-	}
-
-	return mongodbContainer, cleanup, err
-}
-
-func MongoTestSetup() (*storage.MongoStorage, func(), error) {
-	ctx := context.Background()
-
-	mc, cleanup, err := SetupTestMongoContainer(ctx)
+	store, err = utils.CreateTestStorage(ctx, testDB.ConStr)
 	if err != nil {
-		return nil, nil, err
+		panic(err)
 	}
 
-	cs, err := mc.ConnectionString(ctx)
-	if err != nil {
-		return nil, cleanup, err
+	server = NewServer("", store)
+	utils.CreateTestUser(store, &testUser)
+
+	// Run all tests in the package
+	code := m.Run()
+
+	// I don't think we need to disconnect the db client since we are cleaning the container itself but I leave both just in case
+	if cleanErr := store.Disconnect(ctx); cleanErr != nil {
+		panic(cleanErr)
 	}
 
-	testConfig := &config.Config{
-		MongoUri: cs,
-		DBName:   "testdb",
+	// Cleanup after all tests have run
+	if cleanErr := testDB.Cleanup(); cleanErr != nil {
+		panic(cleanErr)
 	}
 
-	store, err := storage.NewMongoStorage(ctx, testConfig)
-	if err != nil {
-		return nil, cleanup, err
-	}
-
-	return store, cleanup, nil
+	// Exit with the code returned from m.Run()
+	os.Exit(code)
 }
 
 func TestHandleGetUsersByID(t *testing.T) {
-	store, _, err := MongoTestSetup()
-	if err != nil {
-		t.Fatalf("Error instantiating test container: %v", err)
-	}
-
-	//defer cleanup() // Defer the cleanup function to be called after the test
-
-	// Create test user
-	testUser := &types.User{
-		Name:     "testuser",
-		Email:    "test@example.com",
-		Password: "password123",
-	}
-
-	// Call the Create method
-	if err := store.Create(context.Background(), testUser); err != nil {
-		t.Fatal("Error creating a test user", err)
-	}
-
-	// Create a new server using the store
-	server := NewServer("", store)
-
 	userID := testUser.ID.Hex()
 
 	// Create a request to get the user by ID
@@ -109,5 +87,9 @@ func TestHandleGetUsersByID(t *testing.T) {
 	if user.ID.Hex() != userID {
 		t.Errorf("Returned user ID does not match the inserted one: got %v want %v",
 			user.ID.Hex(), userID)
+	}
+
+	if user != testUser {
+		t.Fatalf("returned user is not the testUser")
 	}
 }
