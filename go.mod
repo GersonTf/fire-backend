@@ -1,6 +1,6 @@
 module github.com/GersonTf/fire-backend
 
-go 1.21.2
+go 1.21.3
 
 require (
 	github.com/testcontainers/testcontainers-go v0.25.0
