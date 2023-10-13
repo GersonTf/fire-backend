@@ -7,7 +7,6 @@ import (
 
 	"github.com/GersonTf/fire-backend/config"
 	"github.com/GersonTf/fire-backend/storage"
-	"github.com/GersonTf/fire-backend/types"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
 )
