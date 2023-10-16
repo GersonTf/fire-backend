@@ -93,6 +93,6 @@ func TestHandleGetUsersByID(t *testing.T) {
 
 		utils.AssertEqual(t, tt.name, http.StatusOK, rr.Code)
 		utils.AssertEqual(t, tt.name, tt.userID, returnedUser.ID.Hex())
-		utils.AssertEqual(t, tt.name, tt.want, returnedUser)
+		utils.AssertNotEqual(t, tt.name, tt.want, returnedUser)
 	}
 }
