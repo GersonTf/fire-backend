@@ -27,20 +27,11 @@ jobs:
           # When `install-mode` is `binary` (default) the value can be v1.2 or v1.2.3 or `latest` to use the latest version.
           # When `install-mode` is `goinstall` the value can be v1.2.3, `latest`, or the hash of a commit.
           version: v1.54
-          skip-pkg-cache: true
+          # skip-pkg-cache: true
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      # Caching step for Go modules
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
 
       - name: Set up Go
         uses: actions/setup-go@v4
