@@ -11,6 +11,10 @@ build:
 tests:
 	go test ./...
 
+# run the lint
+lint:
+	golangci-lint run
+
 # Run the project
 run:
 	go run main.go --listenaddr $(listenaddr)
