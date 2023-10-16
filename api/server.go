@@ -44,10 +44,16 @@ func (s *Server) handleGetUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	err = json.NewEncoder(w).Encode(user)
+	if err != nil {
+		panic(err) //todo temporary while I define a proper strategy for errors in the handlers
+	}
 }
 
 func (s *Server) handleHealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("I am alive!!"))
+	_, err := w.Write([]byte("I am alive!!"))
+	if err != nil {
+		panic(err) //todo temporary while I define a proper strategy for errors in the handlers
+	}
 }
