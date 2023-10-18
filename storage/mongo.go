@@ -84,7 +84,8 @@ func (s *MongoStorage) Save(ctx context.Context, user *types.User) error {
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	collection := s.db.Collection(UserCollection)
+	collection := s.db.Collection(UserCollection) //todo this could probably live outside of the func
+
 	result, err := collection.InsertOne(ctx, bson.M{
 		"username": user.Name,
 		"email":    user.Email,
@@ -97,4 +98,25 @@ func (s *MongoStorage) Save(ctx context.Context, user *types.User) error {
 	// Update the ID field of the user argument
 	user.ID = result.InsertedID.(primitive.ObjectID)
 	return nil
+}
+
+// saveAll assumes the users slice don't have generated IDs
+func (s *MongoStorage) SaveAll(ctx context.Context, users []*types.User) error {
+	documents := make([]interface{}, len(users))
+
+	for i, user := range users {
+		// Generate new ObjectID for the user
+		user.ID = primitive.NewObjectID()
+
+		documents[i] = bson.M{
+			"_id":      user.ID,
+			"username": user.Name,
+			"email":    user.Email,
+			"password": user.Password,
+		}
+	}
+
+	collection := s.db.Collection(UserCollection) //todo this could probably live outside of the func
+	_, err := collection.InsertMany(ctx, documents)
+	return err
 }

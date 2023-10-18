@@ -15,7 +15,7 @@ import (
 	"github.com/GersonTf/fire-backend/utils"
 )
 
-var testUser types.User
+var testUsers []*types.User //don't modify it between tests to ensure test isolation
 var store storage.Storer
 var server *Server
 
@@ -37,8 +37,10 @@ func TestMain(m *testing.M) {
 	server = NewServer("", store)
 
 	//store.Save gets the user pointer and adds the inserted db ID to it so we can use it in the tests
-	testUser.NewUser("testUser", "test@test.com", "testPassword")
-	if saveErr := store.Save(ctx, &testUser); saveErr != nil {
+	testUsers = append(testUsers, &types.User{Name: "testUser", Email: "test@test.com", Password: "testPassword"})
+	testUsers = append(testUsers, &types.User{Name: "secondU", Email: "second@user.com", Password: "pass"})
+	saveErr := store.SaveAll(ctx, testUsers)
+	if saveErr != nil {
 		panic(saveErr)
 	}
 
@@ -60,39 +62,37 @@ func TestMain(m *testing.M) {
 }
 
 func TestHandleGetUsersByID(t *testing.T) {
-	tests := []struct {
-		name   string
+	tests := map[string]struct {
 		want   types.User
 		userID string
 	}{
-		{
-			name:   "Getting the initial test user",
-			want:   testUser,
-			userID: testUser.ID.Hex(),
-		},
+		"Getting the initial test user": {want: *testUsers[0], userID: testUsers[0].ID.Hex()},
+		"Getting the second test user":  {want: *testUsers[1], userID: testUsers[1].ID.Hex()},
 	}
 
-	for _, tt := range tests {
-		// Create a request to get the user by ID
-		req, err := http.NewRequest("GET", "/user?id="+tt.userID, nil)
-		if err != nil {
-			t.Fatalf("Failed to create request: %v", err)
-		}
+	for tName, tt := range tests {
+		t.Run(tName, func(t *testing.T) {
+			// Create a request to get the user by ID
+			req, err := http.NewRequest("GET", "/user?id="+tt.userID, nil)
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
 
-		// Create a ResponseRecorder to record the response
-		rr := httptest.NewRecorder()
+			// Create a ResponseRecorder to record the response
+			rr := httptest.NewRecorder()
 
-		// Call the handler directly
-		server.handleGetUserByID(rr, req)
+			// Call the handler directly
+			server.handleGetUserByID(rr, req)
 
-		// Check the response body
-		var returnedUser types.User
-		if err := json.Unmarshal(rr.Body.Bytes(), &returnedUser); err != nil {
-			t.Fatalf("Failed to unmarshal response body: %v", err)
-		}
+			// Check the response body
+			var returnedUser types.User
+			if err := json.Unmarshal(rr.Body.Bytes(), &returnedUser); err != nil {
+				t.Fatalf("Failed to unmarshal response body: %v", err)
+			}
 
-		utils.AssertEqual(t, tt.name, http.StatusOK, rr.Code)
-		utils.AssertEqual(t, tt.name, tt.userID, returnedUser.ID.Hex())
-		utils.AssertEqual(t, tt.name, tt.want, returnedUser)
+			utils.AssertEqual(t, http.StatusOK, rr.Code)
+			utils.AssertEqual(t, tt.userID, returnedUser.ID.Hex())
+			utils.AssertEqual(t, tt.want, returnedUser)
+		})
 	}
 }
