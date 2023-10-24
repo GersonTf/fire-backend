@@ -62,7 +62,6 @@ func (s *MongoStorage) Get(ctx context.Context, id string) (*types.User, error) 
 	var user types.User
 
 	collection := s.db.Collection(UserCollection)
-
 	filter := bson.M{"_id": objID}
 
 	err = collection.FindOne(ctx, filter).Decode(&user)
@@ -71,12 +70,11 @@ func (s *MongoStorage) Get(ctx context.Context, id string) (*types.User, error) 
 	case mongo.ErrNoDocuments:
 		return nil, fmt.Errorf("user %s not found", id)
 	case nil:
-		// No error, so do nothing
+		return &user, nil
 	default:
 		return nil, err
 	}
 
-	return &user, nil
 }
 
 // todo should be in user
@@ -110,7 +108,8 @@ func (s *MongoStorage) SaveAll(ctx context.Context, users []*types.User) error {
 
 		documents[i] = bson.M{
 			"_id":      user.ID,
-			"username": user.Name,
+			"name":     user.Name,
+			"lastName": user.LastName,
 			"email":    user.Email,
 			"password": user.Password,
 		}

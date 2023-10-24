@@ -37,8 +37,9 @@ func TestMain(m *testing.M) {
 	server = NewServer("", store)
 
 	//store.Save gets the user pointer and adds the inserted db ID to it so we can use it in the tests
-	testUsers = append(testUsers, &types.User{Name: "testUser", Email: "test@test.com", Password: "testPassword"})
-	testUsers = append(testUsers, &types.User{Name: "secondU", Email: "second@user.com", Password: "pass"})
+	testUsers = append(testUsers, &types.User{Name: "testUser", LastName: "Lawson", Email: "test@test.com", Password: "testPassword"})
+	testUsers = append(testUsers, &types.User{Name: "secondU", LastName: "Foo", Email: "second@user.com", Password: "pass"})
+
 	saveErr := store.SaveAll(ctx, testUsers)
 	if saveErr != nil {
 		panic(saveErr)

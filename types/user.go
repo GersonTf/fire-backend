@@ -1,12 +1,17 @@
 package types
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"fmt"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 const USER string = "user"
 
 type User struct {
 	ID       primitive.ObjectID `json:"id" bson:"_id"`
-	Name     string             `json:"name" bson:"username"`
+	Name     string             `json:"name" bson:"name"`
+	LastName string             `json:"lastName" bson:"lastName"`
 	Email    string             `json:"email" bson:"email"`
 	Password string             `json:"password" bson:"password"`
 }
@@ -17,4 +22,8 @@ func (u *User) NewUser(name, email, password string) {
 	u.Name = name
 	u.Email = email
 	u.Password = password
+}
+
+func (u *User) String() string {
+	return fmt.Sprintf("%s %s", u.Name, u.LastName)
 }

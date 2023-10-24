@@ -60,7 +60,7 @@ func CreateTestStorage(ctx context.Context, dbConn string) (storage.Storer, erro
 func AssertEqual(t *testing.T, want, got any) {
 	t.Helper() //marking this as a testing helper is important so the test tool can report errors correctly
 	if !reflect.DeepEqual(want, got) {
-		t.Fatalf("Wanted %v, got %v", want, got)
+		t.Fatalf("\nWanted %v \ngot    %v", want, got) //the three spaces make the wanted/got values start at the same place
 	}
 }
 
