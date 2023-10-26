@@ -1,3 +1,7 @@
+// Package types provides shared data types used across the application.
+// It offers a centralized location for defining and working with types
+// that are utilized in multiple areas of the application, ensuring
+// consistency and ease of maintenance.
 package types
 
 import (
@@ -18,8 +22,9 @@ type User struct {
 
 func ValidateUser(u *User) bool { return true }
 
-func (u *User) NewUser(name, email, password string) {
+func (u *User) NewUser(name, lastName, email, password string) {
 	u.Name = name
+	u.LastName = lastName
 	u.Email = email
 	u.Password = password
 }

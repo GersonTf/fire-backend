@@ -98,7 +98,7 @@ To execute the tests, use the following command:
 go test ./...
 ```
 
-### Additional Options
+### Additional Test Arguments
 
 1. **Verbose Output:** To view more detailed test logs, use the `-v` flag.
 
@@ -118,4 +118,31 @@ go test ./...
    go test ./... -run=<test_pattern>
    ```
 
-Replace `<test_pattern>` with your desired regex pattern or test name.
+   Replace `<test_pattern>` with your desired regex pattern or test name.
+
+## Documentation
+
+To access the project documentation, follow these steps:
+
+1. Install the Go documentation tool:
+
+   ```
+   go install golang.org/x/tools/cmd/godoc
+   ```
+
+2. Run the documentation server with the play option:
+
+   ```
+   godoc -play -http ":6060"
+   ```
+
+3. Once the server is running, you can access the general Go documentation at:
+
+   ```
+   http://localhost:6060/pkg/
+   ```
+
+4. For this project's specific documentation, visit:
+   ```
+   http://localhost:6060/pkg/github.com/GersonTf/fire-backend/
+   ```
