@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: gersontf/fire-backend
+  IMAGE_NAME: theblazerg/fireultimate # Your repository name on Docker Hub
 
 jobs:
   build-and-push:
@@ -33,6 +33,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tag-suffix: fire-backend # This suffix makes the full image tag "theblazerg/fireultimate:fire-backend"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
