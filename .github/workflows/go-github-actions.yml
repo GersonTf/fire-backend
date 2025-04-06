@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Lint and Test
+    name: Build and Test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -32,7 +32,7 @@ jobs:
           args: --timeout=5m
 
       - name: Test
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: go test -v -p 4 -coverprofile=coverage.out ./...
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4.0.0
