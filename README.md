@@ -2,25 +2,29 @@
 
 Welcome to the Fire-Backend project.
 
+## Prerequisites
+
+- Go 1.24.0 or later
+- Docker (for running tests with test containers)
+- Make (optional, but recommended for using the Makefile)
+
 ## Running the Fire Backend Project
 
-This project is based on Go 1.21.X You can build and run it as follows:
+This project is based on Go 1.24.0. You can build and run it using the Makefile commands:
 
 ### Building the Project
 
-```
-go build -o fire-backend
+```bash
+make build
 ```
 
 ### Running the Project
 
-Execute the following command:
-
-```
-go run main.go --listenaddr $(listenaddr)
+```bash
+make run
 ```
 
-The default listen address is: `8080`
+The default listen address is: `:8080`
 
 ### Dockerized Version
 
@@ -28,121 +32,97 @@ The project is also dockerized and can be built and run using Docker.
 
 #### Building the Docker Image
 
-Set the image name:
-
-```
-IMAGE_NAME=fire-backend
-```
-
-Then, build the image:
-
-```
-docker build -t $(IMAGE_NAME) .
+```bash
+make docker-build
 ```
 
 #### Running the Docker Image
 
-```
-docker run -p 8080:8080 $(IMAGE_NAME)
+```bash
+make docker-run
 ```
 
-## Linting with `golangci-lint`
+## Development Tools
+
+### Linting
 
 This project uses [`golangci-lint`](https://golangci-lint.run/usage/quick-start/) as its linter.
 
-### Installation
+#### Installation
 
-To install `golangci-lint` locally, you can use the following command:
-
-```bash
-curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
-```
-
-After installation, you can verify the version with:
+To install the latest version of `golangci-lint`:
 
 ```bash
-golangci-lint --version
+make install-lint
 ```
 
-### Usage
+#### Usage
 
-To run the lint tests, use the following command:
+To run the linter:
+
+```bash
+make lint
+```
+
+Or directly:
 
 ```bash
 golangci-lint run
 ```
 
-This is equivalent to:
+### Testing
+
+The project uses test containers for integration tests with MongoDB. Make sure Docker is running before executing tests.
+
+#### Running Tests
+
+To run all tests:
 
 ```bash
-golangci-lint run ./...
+make test
 ```
 
-For those who prefer Docker, you can use the Docker version as follows:
+This will run tests with verbose output and proper test container support.
+
+#### Additional Test Options
+
+You can also run tests directly with Go commands:
 
 ```bash
-docker run -t --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.54.2 golangci-lint run -v
+# Run all tests in all packages
+go test -v ./...
+
+# Run with test coverage
+go test -cover ./...
+
+# Run tests in random order
+go test -v -shuffle=on ./...
 ```
 
-to run the tests:
-go test ./...
+### Running All Checks
 
-add -v (verbose) for more detailed test logs
--shuffle=on for executing tests in a random order
+To run both linting and tests:
 
-## Running Tests
-
-To execute the tests, use the following command:
-
+```bash
+make check
 ```
-go test ./...
-```
-
-### Additional Test Arguments
-
-1. **Verbose Output:** To view more detailed test logs, use the `-v` flag.
-
-   ```
-   go test ./... -v
-   ```
-
-2. **Randomized Test Execution:** If you wish to execute tests in a random order, include the `-shuffle=on` flag.
-
-   ```
-   go test ./... -shuffle=on
-   ```
-
-3. **Specific Test Case:** To run a particular test case, utilize the `run` flag followed by the test name. The `run` flag accepts regex patterns, enabling you to target specific or groups of tests.
-
-   ```
-   go test ./... -run=<test_pattern>
-   ```
-
-   Replace `<test_pattern>` with your desired regex pattern or test name.
 
 ## Documentation
 
-To access the project documentation, follow these steps:
+To access the project documentation:
 
 1. Install the Go documentation tool:
 
-   ```
+   ```bash
    go install golang.org/x/tools/cmd/godoc
    ```
 
-2. Run the documentation server with the play option:
+2. Run the documentation server:
 
-   ```
+   ```bash
    godoc -play -http ":6060"
    ```
 
-3. Once the server is running, you can access the general Go documentation at:
-
-   ```
-   http://localhost:6060/pkg/
-   ```
-
-4. For this project's specific documentation, visit:
-   ```
-   http://localhost:6060/pkg/github.com/GersonTf/fire-backend/
-   ```
+3. Access the documentation at:
+   - General Go documentation: `http://localhost:6060/pkg/`
+   - Project documentation: `http://localhost:6060/pkg/github.com/GersonTf/fire-backend/`

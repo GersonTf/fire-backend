@@ -7,7 +7,6 @@ import (
 
 	"github.com/GersonTf/fire-backend/config"
 	"github.com/GersonTf/fire-backend/storage"
-	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
 )
 
@@ -22,7 +21,7 @@ type TestDB struct {
 }
 
 func SetupTestMongoContainer(ctx context.Context) (*TestDB, error) {
-	mongodbContainer, initErr := mongodb.RunContainer(ctx, testcontainers.WithImage("mongo:6"))
+	mongodbContainer, initErr := mongodb.Run(ctx, "mongo:8")
 	if initErr != nil {
 		return nil, initErr
 	}
