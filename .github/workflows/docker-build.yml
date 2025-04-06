@@ -40,5 +40,5 @@ jobs:
         with:
           context: .
           push: ${{ github.event.workflow_run.head_branch == 'main' }}
-          tags: fire-backend
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:fire-backend
           labels: ${{ steps.meta.outputs.labels }}
