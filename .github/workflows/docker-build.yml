@@ -36,9 +36,9 @@ jobs:
           tag-suffix: fire-backend # This suffix makes the full image tag "theblazerg/fireultimate:fire-backend"
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: ${{ github.event.workflow_run.head_branch == 'main' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: fire-backend
           labels: ${{ steps.meta.outputs.labels }}
